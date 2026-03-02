@@ -8,8 +8,8 @@ void audioTask(void *pvParameters) {
     AudioOutputI2S *out = new AudioOutputI2S();
     
     // Setting up I2S output
-    out->setPinout(26, 25, 22); // BCLK, LRCK, DOUT
-    out->setGain(0.2); // Volume control (0.0 to 1.0)
+    out->SetPinout(26, 25, 22); // BCLK, LRCK, DOUT
+    out->SetGain(0.2); // Volume control (0.0 to 1.0)
     mp3->begin(file, out);
 
     // Main audio loop
@@ -20,4 +20,4 @@ void audioTask(void *pvParameters) {
             vTaskDelay(pdMS_TO_TICKS(100));
         }vTaskDelay(1); 
     }
-}"
+}

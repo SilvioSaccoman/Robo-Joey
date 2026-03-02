@@ -1,8 +1,4 @@
-#ifndef WIFI_MANAGER_H
-#define WIFI_MANAGER_H
-
-#include <WiFi.h>
-
+#include "WiFiManager.h"
 // Sostituisci con le tue credenziali
 const char* ssid_global = SSID;
 const char* pass_global = PASSWORD_WIFI;
@@ -21,5 +17,3 @@ void initWiFi() {
 bool isWiFiConnected() {
     return (WiFi.status() == WL_CONNECTED);
 }
-
-#endif

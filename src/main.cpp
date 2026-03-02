@@ -1,5 +1,5 @@
 #include "Audio.h"
-#include "WiFi.h"
+#include "WiFiManager.h"
 
 extern "C" void app_main() {
     initArduino();
