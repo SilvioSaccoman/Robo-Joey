@@ -12,11 +12,11 @@ extern "C" void app_main() {
         if (isWiFiConnected()) {
             static bool msgShown = false;
             if (!msgShown) {
-                Serial.printf("[WIFI] Connesso! IP: %s\n", WiFi.localIP().toString().c_str());
+                ESP_LOGI("WiFi", "Connesso a WiFi: %s", SSID);
                 msgShown = true;
             }
         } else {
-            Serial.println("[WIFI] Ricerca segnale...");
+            ESP_LOGI("WiFi", "Ricerca segnale...");
         }
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
