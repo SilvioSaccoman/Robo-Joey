@@ -9,7 +9,7 @@ void audioTask(void *pvParameters) {
     
     // Setting up I2S output
     out->SetPinout(26, 25, 22); // BCLK, LRCK, DOUT
-    out->SetGain(2.0); // Volume control (0.0 to 1.0)
+    out->SetGain(3.5); // Volume control (0.0 to 1.0)
     mp3->begin(file, out);
 
     // Main audio loop
