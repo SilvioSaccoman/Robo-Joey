@@ -12,25 +12,25 @@ void Setup_Motor(){
 }
 
 void Move_Forward() {
-    stepperL.setSpeed(max_speed); 
-    stepperR.setSpeed(-max_speed); 
+    stepperL.setSpeed(max_speed*speedMultiplier); 
+    stepperR.setSpeed(-max_speed*speedMultiplier); 
 }
 
 void Move_Backward() {
-    stepperL.setSpeed(-max_speed);
-    stepperR.setSpeed(max_speed);
+    stepperL.setSpeed(-max_speed*speedMultiplier);
+    stepperR.setSpeed(max_speed*speedMultiplier);
 }
 
 void Turn_Right() {
     // Left motor forward, right motor less forward for a right turn
-    stepperL.setSpeed(max_speed);
-    stepperR.setSpeed(max_speed);
+    stepperL.setSpeed(max_speed*speedMultiplier);
+    stepperR.setSpeed(max_speed*speedMultiplier);
 }
 
 void Turn_Left() {
     // Left motor less forward, right motor forward for a left turn
-    stepperL.setSpeed(-max_speed);
-    stepperR.setSpeed(-max_speed);
+    stepperL.setSpeed(-max_speed*speedMultiplier);
+    stepperR.setSpeed(-max_speed*speedMultiplier);
 }
 
 void Stop_Motor() {

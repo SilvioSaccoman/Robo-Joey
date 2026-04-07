@@ -4,6 +4,8 @@
 #include "Arduino.h"
 #include <AccelStepper.h>
 
+extern float speedMultiplier; // Global multiplier for dynamic speed scaling
+
 // LEFT MOTOR
 #define STEP_L 14
 #define DIR_L 12
@@ -13,8 +15,8 @@
 #define DIR_R 13
 
 // Speed settings
-#define max_speed 2000 // 150 RPM 
-#define acceleration 1000 // Acceleration in steps/s^2
+#define max_speed 3000 // 150 RPM 
+#define acceleration 2000 // Acceleration in steps/s^2
 
 extern AccelStepper stepperL;
 extern AccelStepper stepperR;

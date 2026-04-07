@@ -1,7 +1,11 @@
 #include "InputManager.h"
 
 static ControlPacket lastValidCommand = {0, 0};
+static uint8_t previousCommand = 99; // Stores the penultly received command
 static uint32_t lastReceptionTime = 0;
+
+// Global multiplier for dynamic speed scaling
+float speedMultiplier = 0.25f; 
 
 void processInput(ControlPacket packet) {
     lastValidCommand = packet;
@@ -14,54 +18,71 @@ const uint32_t AUDIO_COOLDOWN = 3000; // 3 seconds
 
 void inputTask(void *pvParameters) {
     static uint8_t lastLoggedCommand = 99;
+    
     while (1) {
-        // Watchdog: se non ricevo pacchetti da più di 300ms, fermo tutto
+        // Watchdog: if no packets received for > 300ms, stop and reset multiplier
         if (millis() - lastReceptionTime > 300) {
-            //ESP_LOGW("INPUT", "Nessun comando ricevuto da 300ms, fermo i motori");
-            //Stop_Motor();
+            speedMultiplier = 0.25f;
+            Stop_Motor();
         } else {
-            // Applica la logica in base al comando
+            
+            // Multiplier Logic
+            // If the current command matches the previous one and is not a STOP
+            if (lastValidCommand.command == previousCommand && lastValidCommand.command != STOP_MOTOR) {
+                speedMultiplier += 0.05f;
+                if (speedMultiplier > 1.0f) speedMultiplier = 1.0f;
+            } else {
+                // Reset multiplier if command changes or robot stops
+                speedMultiplier = 0.25f;
+            }
+
+            // Update previous command for the next cycle
+            previousCommand = lastValidCommand.command;
+
             switch (lastValidCommand.command) {
                 case STOP_MOTOR: 
                     audioTriggered = false; // Reset audio trigger when stopping
                     Stop_Motor(); 
                 break;
+
                 case MOVE_FORWARD: 
                     Move_Forward();  
                 break;
+
                 case MOVE_BACKWARD: 
                     Move_Backward(); 
-                    break;
+                break;
+
                 case TURN_RIGHT: 
                     Turn_Right();    
-                    break;
+                break;
+
                 case TURN_LEFT: 
                     Turn_Left();     
-                    break;
+                break;
+
                 case TRIGGER_AUDIO_TASK: 
-                    
                     if (!audioTriggered && (millis() - lastAudioTime > AUDIO_COOLDOWN)) {
                         ESP_LOGI("INPUT", "How you doin'?");
                         if (audioTaskHandle != NULL) {
-                            xTaskNotifyGive(audioTaskHandle); // Wake up the audio task to play the sound
+                            xTaskNotifyGive(audioTaskHandle); // Wake up audio task
                         }
                         audioTriggered = true;
                         lastAudioTime = millis();
                     }
-            
-                    break;
+                break;
+
                 default: 
-                    ESP_LOGW("INPUT", "Comando sconosciuto: %d", lastValidCommand.command);
-                    //Stop_Motor();   
-                    break;
+                    ESP_LOGW("INPUT", "Unknown command: %d", lastValidCommand.command);
+                break;
             }
         }
 
         if (lastValidCommand.command != lastLoggedCommand) {
-            ESP_LOGI("INPUT", "Nuovo stato: %d", lastValidCommand.command);
+            ESP_LOGI("INPUT", "Cmd: %d | Multiplier: %.2f", lastValidCommand.command, speedMultiplier);
             lastLoggedCommand = lastValidCommand.command;
         }
 
-        vTaskDelay(pdMS_TO_TICKS(20)); // Frequenza di aggiornamento motori
+        vTaskDelay(pdMS_TO_TICKS(20)); // Motor update frequency
     }
 }
