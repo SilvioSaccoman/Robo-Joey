@@ -34,8 +34,15 @@ void Turn_Left() {
 }
 
 void Stop_Motor() {
-    stepperL.setSpeed(0);
-    stepperR.setSpeed(0);
+    float currentSpeed = stepperL.speed();
+    // Apply a braking effect by reducing the speed gradually instead of an immediate stop
+    if (abs(currentSpeed) > 500) {
+        stepperL.setSpeed(currentSpeed * 0.7); 
+        stepperR.setSpeed(stepperR.speed() * 0.7);
+        } else {
+        stepperL.setSpeed(0);
+        stepperR.setSpeed(0);
+    }
 }
 
 void motorTask(void *pvParameters) {

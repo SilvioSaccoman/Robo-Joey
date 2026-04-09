@@ -20,24 +20,25 @@ void inputTask(void *pvParameters) {
     static uint8_t lastLoggedCommand = 99;
     
     while (1) {
-        // Watchdog: if no packets received for > 300ms, stop and reset multiplier
-        if (millis() - lastReceptionTime > 300) {
+        // Watchdog: if no packets received for > 500ms, stop and reset multiplier
+        if (millis() - lastReceptionTime > 500) {
             speedMultiplier = 0.25f;
             Stop_Motor();
         } else {
             
             // Multiplier Logic
-            // If the current command matches the previous one and is not a STOP
-            if (lastValidCommand.command == previousCommand && lastValidCommand.command != STOP_MOTOR) {
-                speedMultiplier += 0.05f;
-                if (speedMultiplier > 1.0f) speedMultiplier = 1.0f;
-            } else {
-                // Reset multiplier if command changes or robot stops
-                speedMultiplier = 0.25f;
+            if (lastValidCommand.command != STOP_MOTOR) {
+                // Increment the multiplier gradually up to 1.0 for smoother acceleration
+                if (speedMultiplier < 1.0f) {
+                    speedMultiplier += 0.015f; // 1 second to reach the max speed
+                }
             }
 
-            // Update previous command for the next cycle
-            previousCommand = lastValidCommand.command;
+            // Reset multiplier if a new command is received that is different from the previous one
+            if (lastValidCommand.command != previousCommand) {
+                speedMultiplier = 0.25f; 
+                previousCommand = lastValidCommand.command;
+            }
 
             switch (lastValidCommand.command) {
                 case STOP_MOTOR: 
